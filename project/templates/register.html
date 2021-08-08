@@ -1,0 +1,253 @@
+
+{% from "_formhelpers.html" import render_field %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/main.css')}}">
+        <link rel="shortcut icon" type="image/x-icon" href="{{url_for('static', filename='images/favicon.png')}}">
+
+        <script src="https://kit.fontawesome.com/6226df76b9.js" crossorigin="anonymous"></script>
+
+        <meta charset="utf-8" />
+        <title>Sign Up</title>
+
+        <style>
+            body {
+                background: rgb(43,82,121);
+                background: linear-gradient(90deg, rgba(43,82,121,1) 0%, rgba(43,82,121,1) 50%, rgba(0,212,255,1) 100%);
+                margin-top: 1rem;
+            }
+
+            a, a:hover {
+                color: rgb(238, 144, 82);
+            }
+        </style>
+        
+    </head>
+    <body>
+
+        <!-- code to make the register form -->
+
+        <div class="container-fluid">
+            <div class="row" >
+                <div class="col-12 col-md-8 col-lg-4" style="margin:0 auto; padding:0">
+                    {%- with messages = get_flashed_messages(with_categories=True) -%}
+                        {%- if messages -%}
+                            {%- for (category, message) in messages -%}
+                                <div class="alert alert-{{category}}">
+                                    {{message}}
+                                </div>
+                            {%- endfor -%}
+                        {%- endif -%}
+                    {%- endwith -%}
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-12 col-md-8 col-lg-6" style="margin:0 auto;">
+                    <form action="" method="POST">
+                    {{ form.hidden_tag() }} {# same as form.csrf_token #}
+                        <fieldset class='form-group'>
+                            <legend class='border-bottom mb-4 text-white'>Join Today</legend>
+                            <div class="form-row">
+                                <div class='form-group col-md-12'>
+                                    {{ form.username.label(class='form-control-label text-white mb-0') }}
+                                    {% if form.username.errors %}
+                                        {{ form.username(class='form-control form-control-sm is-invalid', placeholder='Enter your username', maxlength=20) }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.username.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.username(class='form-control form-control-sm', placeholder='Enter your username', maxlength=20) }}
+                                        <small id="usernameHelp" class="form-text text-info">Username must be alphanumerical, 2 to 20 characters long.</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class='form-group col-md-12 text-white'>
+                                    {{ render_field(form.email, has_label=True, placeholder='Enter your email') }}
+                                </div>
+                            </div>
+                            
+                            {{form.password.label(class='form-control-label text-white mb-0')}}
+                            <div class="form-row">
+                            {% if form.password.errors %}
+                                <div class='input-group input-group-sm col-md-12'>
+                                    {{ form.password(class='form-control form-control-sm is-invalid', placeholder='Enter your password', maxlength=30) }}
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-warning" type="button" id="psw-show">show</button>
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        {% for error in form.password.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class='input-group input-group-sm col-md-12'>
+                                    {{ form.password(class='form-control form-control-sm', placeholder='Enter your password', maxlength=30) }}
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-warning" type="button" id="psw-show">show</button>
+                                    </div>
+                                </div>
+                            {% endif %}
+                                <small id="passwordHelp" class="form-text text-info ml-1">
+                                    Password must: <br />
+                                    <ul>
+                                        <li>be 8 to 30 characters long</li>
+                                        <li>contain at least {{ config['PASSWORD_NUM_LOWERS_MIN'] }} lowercase letters</li>
+                                        <li>contain at least {{ config['PASSWORD_NUM_UPPERS_MIN'] }} uppercase letters</li>
+                                        <li>contain at least {{ config['PASSWORD_NUM_DIGITS_MIN'] }} digits</li>
+                                        <li>contain at least {{ config['PASSWORD_NUM_SYMBOLS_MIN'] }} one of the following characters: {{ config['PASSWORD_SPECIAL_SYMBOLS'] }}</li>
+                                    </ul>
+                                </small>
+                            </div><p></p>    
+                            
+
+                            {{form.confirm_password.label(class='form-control-label text-white mb-0')}}
+                            <div class="form-row">
+                            {% if form.confirm_password.errors %}
+                                <div class='input-group input-group-sm col-md-12'>
+                                    {{ form.confirm_password(class='form-control form-control-sm is-invalid', placeholder='Re-enter your password', maxlength=30) }}
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-warning" type="button" id="confirm-psw-show">show</button>
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        {% for error in form.confirm_password.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class='input-group input-group-sm col-md-12'>
+                                    {{ form.confirm_password(class='form-control form-control-sm', placeholder='Re-enter your password', maxlength=30) }}
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-warning" type="button" id="confirm-psw-show">show</button>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            </div><p></p>    
+                            
+                            {{form.global_logon.label(class='form-control-label text-white mb-0')}}
+                            <div class="form-row">
+                            {% if form.global_logon.errors %}
+                                <div class='input-group input-group-sm col-md-12'>
+                                    {{ form.global_logon(class='form-control form-control-sm is-invalid', placeholder='Enter your Global Logon', maxlength=46) }}
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-warning" type="button" id="global-logon-show">show</button>
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        {% for error in form.global_logon.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class='input-group input-group-sm col-md-12'>
+                                    {{ form.global_logon(class='form-control form-control-sm', placeholder='Enter your Global Logon', maxlength=46) }}
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-warning" type="button" id="global-logon-show">show</button>
+                                    </div>
+                                </div>
+                                <small id="globalLogon" class="form-text text-info ml-1">Password/paraphrase must be 8 to 46 characters long.</small>
+                            {% endif %}
+                            </div><p></p>    
+
+                            <div class="form-row">
+                                <div class='form-group col-md-12 text-white'>
+                                    {{ form.recaptcha }}
+                                    {% for error in form.recaptcha.errors %}
+                                        <ul><li style="color:red;">{{error}}</li></ul>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class='form-group'>
+                            {{ form.submit(class='btn btn-outline-info') }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 col-md-8 col-lg-6" style="margin:0 auto;">
+                    <div class='border-top pt-3'>
+                        <small class='text-light'>
+                            Already Have An Account? <a href="{{ url_for('login') }}">Sign In</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 col-md-8 col-lg-6" style="margin:0 auto;">
+                    <p class='text-danger mt-5'>
+                        {% if form.errors %}
+                            {% for key,value in form.errors.items() %}
+                                {{key}}: {{value}}<br />
+                            {% endfor %}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        
+
+
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <!-- Popper JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+        <script>
+            $(document).ready(function(){
+                var showPsw = $('#psw-show');  //show/hide button for the password
+                var showConfirmPsw = $('#confirm-psw-show');  //show/hide button for the confirm password
+                var showGlobalLogon = $('#global-logon-show');  //show/hide button for the global logon
+
+                var pswField = $('#password');  //password field
+                var confirmPswField = $('#confirm_password');  //confirm password field
+                var globalLogonField = $('#global_logon');  //global logon field
+    
+                showPsw.on('mousedown', function() {
+                    pswField.attr ("type", "text");
+                })
+                showPsw.on('mouseup mouseout', function() {
+                    pswField.attr ("type", "password");
+                })
+
+                showConfirmPsw.on('mousedown', function() {
+                    confirmPswField.attr ("type", "text");
+                })
+                showConfirmPsw.on('mouseup mouseout', function() {
+                    confirmPswField.attr ("type", "password");
+                })
+                
+                showGlobalLogon.on('mousedown', function() {
+                    globalLogonField.attr ("type", "text");
+                })
+                showGlobalLogon.on('mouseup mouseout', function() {
+                    globalLogonField.attr ("type", "password");
+                })
+    
+            })
+    
+        </script>  
+        
+    </body>
+</html>

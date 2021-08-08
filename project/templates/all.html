@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import records_table %}
+
+{% block content %}
+
+{% if records %} {# if there is data in records #}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			<div class="alert alert-info" role="alert">{{records|length}} Records retrieved under this active account</div>
+		</div>
+    </div>
+    <div class="row">
+		<div class="col-12 border-0">
+			<input class="form-control" type="text" id="filter" placeholder="Search for resources...">
+		</div>
+    </div>
+    <div class="row">
+		<div class="col-12 border-0">
+            <a href="#" id="show-all-cols"><small>Show all columns</small></a> <span style="color: lightgrey;">|</span>
+            <!--
+            <a href="{{ url_for('delete_all') }}"><small>Delete all records</small></a> <span style="color: lightgrey;">|</span>
+            -->
+            <a href="#" id="deleteAll"><small>Delete all records</small></a> <span style="color: lightgrey;">|</span>
+            <a href="{{ url_for('download') }}"><small>Download all records</small></a>
+		</div>
+    </div>
+    <div class="row">
+		<div class="col-12 border-0">
+			{# build the records table #}
+            {{ records_table(records=records, action=True, recordIndex=True) }}
+		</div>
+    </div>
+    <div class="row">
+		<div class="col-12 border-0">
+			
+		</div>
+	</div>
+</div>
+{% else  %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12 border-0">
+			<div class="alert alert-danger" role="alert">There are no records in your account!</div>
+		</div>
+	</div>
+</div>
+{% endif %}
+
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete a record</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>You are about to delete this record. Are you sure this is what you want to do?</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-secondary" data-dismiss="modal">Cancel</a>
+                <a href="#" class="btn btn-primary" id="confirm-delete">Yes</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteAllModal" tabindex="-1" role="dialog" aria-labelledby="deleteAllModalLabel" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAllModalLabel">Delete all records</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>You are about to delete all {{records|length}} records. Are you sure this is what you want to do?</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-secondary" data-dismiss="modal">Cancel</a>
+                <!--<a href="#" class="btn btn-primary" id="confirm-deleteAll">Yes</a>-->
+                <form action="{{ url_for('delete_all') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-primary">Yes</button>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}    
+
+{% block script %}
+<script>
+    $(document).ready(function(){
+
+        $("#deleteAll").on("click", function(e) {
+            e.preventDefault();
+            $('#deleteAllModal').modal('show');
+            $("#confirm-deleteAll").attr("href", "{{ url_for('delete_all') }}");
+
+        });
+
+        //alert the user with a bootstrap modal before executing the delete route
+        $("#tbl-records").on("click", 'a#delete-record', function(e) {
+            e.preventDefault();
+            $('#deleteModal').modal('show');
+            $("#confirm-delete").attr("href", $(this).attr("href"));
+
+            // using browser prompt
+            //if (confirm("This action will delete this record! Are you sure you want to do this??")) {
+                //window.location.href = $(this).attr("href");
+            //} 
+            //else {
+                //do nothing
+            //}
+        });
+
+        
+
+
+        $("#filter").on("keyup", function() {
+            filter();
+        });
+
+        /* sticky search field section */
+
+        //this is the object to make sticky after a scroll distance
+        var stickyObj = $("#filter"); 
+
+        //this is the navbar object which is used to determine the scroll distance to exceed 
+        //before object becomes sticky
+        var navbar = $(".navbar");  
+        var table = $("#tbl-records");  //new
+
+        var stickyObjTop = stickyObj.offset().top;  // top position of the sticky object
+        var stickyObjHeight = stickyObj.outerHeight(true);  //full height (padding+margin+border) of the sticky object
+
+        // full height (padding+margin+border) of the navbar
+        // this is the top position where the sticky will stick)
+        var navbarHeight = navbar.outerHeight(true); 
+
+        var tblTop = table.offset().top; //new
+        
+        /*
+        how far to scroll before making the object sticky:
+        top position of the sticky object (which is below of the navbar) minus the full height of the navbar.
+        */
+        var scrolldistance = stickyObjTop-navbarHeight;
+
+        window.onscroll = function() {
+            sticky(scrolldistance, stickyObj, navbarHeight, stickyObjHeight);
+        };
+
+        $(".hide-header").on("click", function(e) {
+            e.preventDefault();
+            var column_number = parseInt($(this).attr('data'));
+            hideColumn(column_number, 'hide')
+
+        });
+
+        $("#show-all-cols").on("click", function(e) {
+            e.preventDefault();
+            showAllColumns()
+
+        });
+
+        //adjusts the height of the record table based on browser window size, on load and on window resize
+        updateTableHeight();
+        window.onresize = function() {
+            updateTableHeight();
+        };
+        
+        //adjusts the height of the record table based on browser window size
+        function updateTableHeight() {
+            var tableTop = $("#tbl-records").offset().top;  // top position of the sticky object
+            var screenHeight = $(window).height();
+            var tableHeight = screenHeight - tableTop;
+            $(".table-responsive").css({
+                'height': tableHeight + 'px'
+            });
+        }
+        
+        
+        
+
+    });
+</script>  
+{% endblock script %}

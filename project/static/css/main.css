@@ -1,0 +1,122 @@
+/**/
+
+
+
+body {
+  background: #fafafa;
+  color: #333333;
+  margin: 5rem 1rem 1rem 1rem;
+  
+    
+}
+
+#ajaxFeedbackContainer {
+  position: absolute;
+  z-index: 9999;
+}
+
+#warning-psw, #warning-glo {
+  display:none;
+  color:red;
+}
+
+fieldset.form-group {
+  margin-bottom:0;
+}
+
+#filter {
+  background-image: url('../images/searchicon.png'); /* Add a search icon to input */
+  background-position: 10px 10px; /* Position the search icon */
+  background-repeat: no-repeat; /* Do not repeat the icon image */
+  padding: 12px 20px 12px 40px; /* Add some padding */
+  margin-bottom: 12px; /* Add some space below the input */
+}
+
+/* 
+The sticky class is added to the object subject to the sticky function 
+with JS when it reaches its scroll position 
+*/
+.sticky {
+  position: fixed;
+  right:0;
+  left:0;
+  z-index: 1;
+  
+  
+
+  /*top: 0;
+  width: inherit;
+  */
+}
+
+.password-cell.show {
+  visibility: hidden;
+}
+
+#hide-password-btn {
+  text-decoration: none;
+  color: red;
+}
+
+.table-responsive {
+  
+  overflow-x: scroll;
+  overflow-y: scroll;
+}
+
+/* custom navbar theme */
+
+.bg-dark {
+  background-color: #343a40 !important;
+}
+
+.navbar-dark .navbar-brand {
+  color: #fff;
+}
+
+.navbar-dark .navbar-brand:hover, 
+.navbar-dark .navbar-brand:focus {
+  color: #fff;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.navbar-dark .navbar-nav .nav-link:hover, 
+.navbar-dark .navbar-nav .nav-link:focus {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.navbar-dark .navbar-nav .nav-link.disabled {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.navbar-dark .navbar-nav .show > .nav-link,
+.navbar-dark .navbar-nav .active > .nav-link,
+.navbar-dark .navbar-nav .nav-link.show,
+.navbar-dark .navbar-nav .nav-link.active {
+  color: #fff;
+}
+
+.navbar-dark .navbar-toggler {
+  color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-dark .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.5)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.navbar-dark .navbar-text {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.navbar-dark .navbar-text a {
+  color: #fff;
+}
+
+.navbar-dark .navbar-text a:hover, 
+.navbar-dark .navbar-text a:focus {
+  color: #fff;
+}

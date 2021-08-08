@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import records_table, record_table %}
+
+{% block content %}
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3 col-md-6 border-0"></div>
+    </div>
+    <div class="row">
+        <div class="col-lg-3 col-md-6 border-0">
+            <div class="card-group">
+                <div class="card pr-2 pl-2 border-0">
+                    <img class="card-img-top" src="{{url_for('static', filename='images/purpose.png')}}" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">Purpose</h5>
+                        <p class="card-text">Use this portal to save all your resources information such as usernames and passwords, add a single or multiple records, update your records and personal information, delete or purge all records.</p>
+                        <p class="card-text"><small class=""></small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 border-0">
+            <div class="card-group">
+                <div class="card pr-2 pl-2 border-0">
+                    <img class="card-img-top" src="{{url_for('static', filename='images/search.png')}}" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">Easy Find</h5>
+                        <p class="card-text">While viewing your records, you can type your resource name in the text box and a JQuery call will return what you are looking for. All in a blink of an eye! </p>
+                        <p class="card-text"><small class=""><a href="{{url_for('all')}}">View all your records</a></small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 border-0">
+            <div class="card-group">
+                <div class="card pr-2 pl-2 border-0">
+                    <img class="card-img-top" src="{{url_for('static', filename='images/upload-file.png')}}" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">Bulk Upload</h5>
+                        <p class="card-text">The bulk upload feature allows you to upload a file with all your accounts. We call that efficiency!</p>
+                        <p class="card-text"><small class=""><a href="{{url_for('bulk_upload')}}">Upload your accounts all at once</a></small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 border-0">
+            <div class="card-group-0">
+                <div class="card pr-2 pl-2 border-0">
+                    <img class="card-img-top" src="{{url_for('static', filename='images/security.png')}}" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">Secured Access</h5>
+                        <p class="card-text">Our secured registration and login system prevents fake emails. Any email change requires a validation before you are allowed to access the application.</p>
+                        <p class="card-text"><small class="text-muted"></small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+   
+
+   
+
+{% if updated_record is defined %}
+    {% if updated_record %} {# if there is a record to display #}
+        
+        {{ record_table(record=updated_record) }}
+        
+    {% endif %} 
+{% endif %} 
+
+
+
+
+
+{% endblock content %}    
+
+
+{% block script %}
+    <script>
+        $(document).ready(function(){
+
+        });
+    </script>
+{% endblock script %}

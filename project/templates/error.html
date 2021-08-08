@@ -1,0 +1,74 @@
+{% from "_formhelpers.html" import render_field %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/main.css')}}">
+        <link rel="shortcut icon" type="image/x-icon" href="{{url_for('static', filename='images/favicon.png')}}">
+
+        <script src="https://kit.fontawesome.com/6226df76b9.js" crossorigin="anonymous"></script>
+
+        <style>
+            body {
+                margin: 5rem 1rem 1rem 1rem;
+                background-color: rgb(43, 82, 121);
+                color:white;
+            }
+        </style>
+
+        <meta charset="utf-8" />
+        <title>{{ error.name }} ({{ error.code }})</title>
+        
+    </head>
+    <body>
+        <div class="container-fluid" >
+            
+            <div class="row align-items-center">
+                <div class="col-2">
+                    
+                </div>
+
+                <div class="col-8 ">
+                    <h1><img src="{{url_for('static', filename='/images/page-not-found.svg')}}" width="200" style="float:left; margin-right:10px"/> {{error.description}}</h1>
+                </div>
+
+                <div class="col-2">
+                    
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <!-- Popper JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        
+		<script src="../static/js/custom.js"></script>
+		
+		<script>
+			$(document).ready(function () {
+				
+			});
+		</script>
+
+    </body>
+</html>
+
+
+
+
+
+
+
+
+

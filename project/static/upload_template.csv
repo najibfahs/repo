@@ -1,0 +1,3 @@
+resourcename,username,password,global_logon,link,additional_info
+resource1,user1,,TRUE,link1;link2,
+resource2,user2,mypsw2,FALSE,link1;link3,additional info2; additional info3

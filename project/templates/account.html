@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block content %}
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+            <h4 class="text-uppercase mb-3">Active username: <mark><small class="text-muted text-lowercase">{{current_user.username}}</small></mark></h4>
+		</div>
+    </div>
+
+    <div class="row">
+		<div class="col-12">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link" id="yourinfo-tab" data-toggle="tab" href="#yourinfo" role="tab" aria-controls="yourinfo" aria-selected="false"><i class='fa fa-user' title="Your info"></i></a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link " id="change-psw-tab" data-toggle="tab" href="#change-psw" role="tab" aria-controls="change-psw" aria-selected="true"><i class='fa fa-key' title="Change your password"></i></a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" id="global-logon-tab" data-toggle="tab" href="#global-logon" role="tab" aria-controls="global-logon" aria-selected="false"><i class='fa fa-globe' title="Change your Global Logon"></i></a>
+                </li>
+            
+                <li class="nav-item">
+                    <a class="nav-link" id="email-tab" data-toggle="tab" href="#email" role="tab" aria-controls="email" aria-selected="false"><i class='fa fa-envelope' title="Update your email"></i></a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show " id="yourinfo" role="tabpanel" aria-labelledby="yourinfo-tab">
+                    <div class="bg-light text-dark p-2">
+                        <h4 class="mt-2">Username</h4>
+                        {{current_user.username}}
+            
+                        <h4 class="mt-3">Password</h4>
+                        <a href="#" id="change_psw">Change your password</a>
+            
+                        <h4 class="mt-3">Global Logon</h4>
+                        {{current_user.global_logon}} <a href="#" id="change_global-logon"><i class='fa fa-pen'></i></a>
+            
+                        <h4 class="mt-3">Email</h4>
+                        {{current_user.email}} <a href="#" id="change_email"><i class='fa fa-pen'></i></a>
+            
+                        <h4 class="mt-3">Date Created</h4>
+                        {{current_user.date_created}} (utc time)
+                    </div>
+                </div>
+            
+                <div class="tab-pane fade" id="change-psw" role="tabpanel" aria-labelledby="change-psw-tab"><br />
+                    <p class="text-danger">You will be logged out upon a successful change of your password. Please log back in.</p>
+            
+            
+                    <form action="{{url_for('updatePassword')}}" method="POST" id="password-frm" name="password-frm">
+                        {{ form_password.hidden_tag() }} {# same as form_password.csrf_token #}
+                        <fieldset class='form-group'>
+                            <legend class='border-bottom text-primary'>Change Your Password</legend>
+            
+                            {{ form_password.current_password.label }}
+                            <div class="form-row">
+                                <div class="input-group input-group-sm col-md-6">
+                                    {% if form_password.current_password.errors %}
+                                        {{ form_password.current_password(placeholder="Enter your current password.", maxlength=30, class="form-control is-invalid") }}
+                                        <div class="input-group-append ">
+                                            <button class="btn btn-outline-secondary" type="button" id="curr-psw-show"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            {% for error in form_password.current_password.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form_password.current_password(placeholder="Enter your current password.", maxlength=30, class="form-control") }}
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" id="curr-psw-show"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <small id="current_password" class="form-text text-muted">8 to 30 characters max.</small><p></p>
+            
+            
+                            {{ form_password.new_password.label }}
+                            <div class="form-row">
+                                <div class="input-group input-group-sm col-md-6">
+                                    {% if form_password.new_password.errors %}
+                                        {{ form_password.new_password(placeholder="Enter your new password.", maxlength=30, class="form-control is-invalid") }}
+                                        <div class="input-group-append ">
+                                            <button class="btn btn-outline-secondary" type="button" id="new-psw-show"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            {% for error in form_password.new_password.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form_password.new_password(placeholder="Enter your new password.", maxlength=30, class="form-control") }}
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" id="new-psw-show"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <small id="passwordHelp" class="form-text text-info ml-1">
+                                Password must: <br />
+                                <ul>
+                                    <li>be 8 to 30 characters long</li>
+                                    <li>contain at least {{ config['PASSWORD_NUM_LOWERS_MIN'] }} lowercase letters</li>
+                                    <li>contain at least {{ config['PASSWORD_NUM_UPPERS_MIN'] }} uppercase letters</li>
+                                    <li>contain at least {{ config['PASSWORD_NUM_DIGITS_MIN'] }} digits</li>
+                                    <li>contain at least {{ config['PASSWORD_NUM_SYMBOLS_MIN'] }} one of the following characters: {{ config['PASSWORD_SPECIAL_SYMBOLS'] }}</li>
+                                </ul>
+                            </small><p></p>
+            
+                            {{ form_password.confirm_new_password.label }}
+                            <div class="form-row">
+                                <div class="input-group input-group-sm col-md-6">
+                                    {% if form_password.confirm_new_password.errors %}
+                                        {{ form_password.confirm_new_password(placeholder="Re-enter your new password.", maxlength=30, class="form-control is-invalid") }}
+                                        <div class="input-group-append ">
+                                            <button class="btn btn-outline-secondary" type="button" id="new-psw-confirm-show"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            {% for error in form_password.confirm_new_password.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form_password.confirm_new_password(placeholder="Re-enter your new password.", maxlength=30, class="form-control") }}
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" id="new-psw-confirm-show"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <small id="confirm_new_password" class="form-text text-muted"></small><p></p>
+                        </fieldset>
+            
+                        <p id="warning-psw">WARNING! Caps lock is ON.</p>
+            
+                        {{ form_password.submit(class='btn btn-primary') }}
+                    </form>
+                </div>
+            
+                <div class="tab-pane fade" id="global-logon" role="tabpanel" aria-labelledby="global-logon-tab">
+                    <h4 class="my-3" style="display: inline-block;">Current Global Logon</h4> : {{current_user.global_logon}}
+                    
+            
+                    <form action="{{url_for('updateGlobalLogon')}}" method="POST" id="global-logon-frm" name="global-logon-frm">
+                        {{ form_global.hidden_tag() }} {# same as form.csrf_token #}
+                        <fieldset class='form-group'>
+                            <!--
+                            <legend class='border-bottom text-primary'>Change Your Password</legend>
+                            -->
+                            {{ form_global.new_global_logon.label }}
+                            <div class="form-row">
+                                <div class="input-group input-group-sm col-md-6">
+                                    {% if form_global.new_global_logon.errors %}
+                                        {{ form_global.new_global_logon(placeholder="Enter your new Global Logon", maxlength=46, class="form-control is-invalid") }}
+                                        <div class="input-group-append ">
+                                            <button class="btn btn-outline-secondary" type="button" id="global-logon-show"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            {% for error in form_global.new_global_logon.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form_global.new_global_logon(placeholder="Enter your new Global Logon", maxlength=46, class="form-control") }}
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" id="global-logon-show"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <small id="new_global_logon" class="form-text text-muted">8 to 46 characters max.</small><p></p>
+                        </fieldset>
+                        <p id="warning-glo">WARNING! Caps lock is ON.</p>
+                        {{ form_global.submit(class='btn btn-primary') }}
+                    </form>
+            
+                </div>
+            
+                <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
+                    <h4 class="my-3" style="display: inline-block;">Current email</h4> : {{current_user.email}}
+                    
+            
+                    <form action="{{url_for('updateEmail')}}" method="POST" id="email-frm" name="email-frm">
+                        {{ form_email.hidden_tag() }} {# same as form.csrf_token #}
+                        <fieldset class='form-group'>
+                            <!--
+                            <legend class='border-bottom text-primary'>Change Your Password</legend>
+                            -->
+                            {{ form_email.new_email.label }}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    {% if form_email.new_email.errors %}
+                                        {{ form_email.new_email(placeholder="Enter your new email", class="form-control form-control-sm is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form_email.new_email.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form_email.new_email(placeholder="Enter your new email", class="form-control form-control-sm") }}
+                                        
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <small id="new_email" class="form-text text-muted"></small><p></p>
+                        </fieldset>
+                        {{ form_email.submit(class='btn btn-primary') }}
+                    </form>
+            
+                </div>
+            </div>
+            
+		</div>
+    </div>
+
+    <div class="row">
+		<div class="col-12">
+            
+            
+		</div>
+    </div>
+</div>
+
+
+
+
+<p></p>
+
+
+
+
+
+
+
+
+
+
+{% endblock content %}
+
+{% block script %}
+<script>
+    $(document).ready(function(){
+        
+        //password fields
+        curr_psw_field = $("#a-current_password");
+        new_psw_field = $("#a-new_password");
+        new_psw_confirm_field = $("#a-confirm_new_password");
+        global_logon_field = $("#b-new_global_logon");
+        
+        //passwords show/hide buttons
+        curr_psw_btn = $("#curr-psw-show");
+        new_psw_btn = $("#new-psw-show");
+        new_psw_confirm_btn = $("#new-psw-confirm-show");
+        global_logon_btn = $("#global-logon-show");
+
+        //initializing which tab is the active one
+        //localStorage.setItem("activeTab", "info");
+        //$('#myTab a[href="#yourinfo"]').tab('show');
+
+        if (localStorage.getItem("activeTab") == null) {
+            $('#myTab a[href="#yourinfo"]').tab('show');
+        }
+        else {
+            anchor = "#myTab a[href='#" + localStorage.getItem("activeTab") + "']";
+            $(anchor).tab('show');
+
+            //$('#myTab a[href="#yourinfo"]').tab('show');
+            
+            //alert(anchor);
+        }
+
+        
+
+        $("#myTab a").on("click", function (e) {
+            if ($(this).attr("href") == "#yourinfo") {
+                localStorage.setItem("activeTab", "yourinfo");
+            }
+
+            else if ($(this).attr("href") == "#change-psw") {
+                localStorage.setItem("activeTab", "change-psw");
+            }
+
+            else if ($(this).attr("href") == "#global-logon") {
+                localStorage.setItem("activeTab", "global-logon");
+            }
+
+            else if ($(this).attr("href") == "#email") {
+                localStorage.setItem("activeTab", "email");
+            }
+            
+            else {
+                localStorage.setItem("activeTab", "yourinfo");
+            }
+        });
+
+
+        curr_psw_btn.on('mousedown', function() {
+            curr_psw_field.attr ("type", "text");
+        });
+        curr_psw_btn.on('mouseup mouseout', function() {
+            curr_psw_field.attr ("type", "password");
+        });
+
+        new_psw_btn.on('mousedown', function() {
+            new_psw_field.attr ("type", "text");
+        });
+        new_psw_btn.on('mouseup mouseout', function() {
+            new_psw_field.attr ("type", "password");
+        });
+
+        new_psw_confirm_btn.on('mousedown', function() {
+            new_psw_confirm_field.attr ("type", "text");
+        });
+        new_psw_confirm_btn.on('mouseup mouseout', function() {
+            new_psw_confirm_field.attr ("type", "password");
+        });
+
+        global_logon_btn.on('mousedown', function() {
+            global_logon_field.attr ("type", "text");
+        });
+        global_logon_btn.on('mouseup mouseout', function() {
+            global_logon_field.attr ("type", "password");
+        });
+
+        $("#change_psw").on("click", function (e) {
+            e.preventDefault();
+            localStorage.setItem("activeTab", "change-psw");
+            $('#myTab a[href="#change-psw"]').tab('show')
+        });
+
+        $("#change_global-logon").on("click", function (e) {
+            e.preventDefault();
+            localStorage.setItem("activeTab", "global-logon");
+            $('#myTab a[href="#global-logon"]').tab('show')
+        });
+
+        $("#change_email").on("click", function (e) {
+            e.preventDefault();
+            localStorage.setItem("activeTab", "email");
+            $('#myTab a[href="#email"]').tab('show')
+        });
+        
+    
+        //detecting CAPS LOCK
+        var warning_psw = $("#warning-psw");
+        var warning_glo = $("#warning-glo");
+        curr_psw_field[0].addEventListener("keyup", function(event) {caplock(event, warning_psw);});
+        new_psw_field[0].addEventListener("keyup", function(event) {caplock(event, warning_psw);});
+        new_psw_confirm_field[0].addEventListener("keyup", function(event) {caplock(event, warning_psw);});
+        global_logon_field[0].addEventListener("keyup", function(event) {caplock(event, warning_glo);});
+
+        //taken from https://www.w3schools.com/howto/howto_js_detect_capslock.asp
+        function caplock(event, warning) {
+            if (event.getModifierState("CapsLock")) {
+                warning.show();
+            } else {
+                warning.hide();
+            }
+        }
+
+    })
+
+</script>  
+{% endblock script %}
+        

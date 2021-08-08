@@ -1,0 +1,57 @@
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+*.db
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ignoring folders #
+######################
+.vscode/
+__pycache__/
+migrations/
+project/utils/__pycache__/
+
+# others #
+######################
+.env
+flaskblog/templates/retired_code.txt
+project/static/logins.csv
+project/static/testlogins.csv
+project/templates/jinja_example_2.txt
+project/templates/hello_world.txt
+project/templates/test.html
+project/templates/test2.html
+

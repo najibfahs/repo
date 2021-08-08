@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field, records_table %}
+
+{% block content %}
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+            <form action="" class="" method="POST" enctype="multipart/form-data" name="uploadForm" id="uploadForm">
+                <fieldset class='form-group' style="margin-bottom: 0;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <legend class='border-bottom mb-4'>Bulk Upload</legend>
+                    <div class="form-row" >
+                        <div class="form-group col-md-6" style="margin-bottom:0">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="upload" name="upload" accept=".csv">
+                                <label class="custom-file-label" for="upload">Choose file...</label>
+                            </div>
+                            <p class="help-block">Use this <a href="{{url_for('static', filename='upload_template.csv')}}">CSV template</a> for the bulk upload.</p>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <button type="submit" class="btn btn-primary mb-2">Upload</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+            
+		</div>
+    </div>
+
+    <div class="row">
+		<div class="col-12">
+            <p id="progress"></p>
+		</div>
+    </div>
+
+    <div class="row">
+		<div class="col-12">
+            <div class="accordion" id="accordionExample">
+                <div class="card">
+                    <div class="card-header" id="headingOne">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Validation of the uploaded file
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                        <div class="card-body">
+                            All duplicate records will be removed, except one.<br />
+                            All records where the following fields are omitted will be ignored: <em>resourcename</em>, <em>username</em> and <em>global_logon</em>.<br />
+                            All empty rows within records will be ignored.<br />
+                            All records with <em>global_logon</em> set to False but without a password will be ignored.<br />
+                            All records with an invalid value for <em>global_logon</em> (must be either true or false), will be ignored.
+                        </div>
+                    </div>
+                </div>
+            </div>
+		</div>
+    </div>
+
+    <div class="row pt-3">
+		<div class="col-12">
+        {%- if skipped_rows is defined -%}
+            {%- if skipped_rows -%}
+                <div class="alert alert-warning">Rows skipped from the file: {{skipped_rows}}</div>
+            {%- else -%}
+                <div class="alert alert-success">No rows were skipped.</div>
+            {%- endif -%}
+        {% endif %}
+            
+		</div>
+    </div>
+
+    <div class="row">
+		<div class="col-12">
+        {%- if added_rows is defined -%}
+            {%- if added_rows -%}
+                <div class="alert alert-success">Rows that passed the validation criteria: {{added_rows}}</div>
+            {%- else -%}
+                <div class="alert alert-warning">No records passed the validation criteria.</div>
+            {%- endif -%}
+        {%- endif -%} 
+            
+		</div>
+    </div>
+
+    <div class="row">
+		<div class="col-12">
+        {%- if records is defined -%}
+            {%- if records -%}
+                <a href="#" id="show-all-cols"><small>Show all columns</small></a>
+                {# build the records table #}
+                {{ records_table(records=records, action=False, recordIndex=False) }}
+                
+            {%- else -%}
+                <div class="alert alert-warning">No records were added to the database.</div>
+            {%- endif -%}
+        {%- endif -%} 
+            
+		</div>
+    </div>
+
+    <div class="row">
+		<div class="col-12">
+         
+            
+		</div>
+    </div>
+</div>
+
+{% endblock content %}    
+
+{% block script %}
+<script>
+    $(document).ready(function(){
+        $('#upload').on('change', function() {
+            $(".custom-file-label").text($('#upload').val())
+        }); 
+
+        $("#uploadForm").on("submit", function() {
+            $("#progress").html('<img src="../static/images/30.gif" />')
+        });
+
+
+        $("#filter").on("keyup", function() {
+            filter();
+        });
+
+        
+
+        
+
+        $(".hide-header").on("click", function(e) {
+            e.preventDefault();
+            var column_number = parseInt($(this).attr('data'));
+            hideColumn(column_number, 'hide')
+
+        });
+
+        $("#show-all-cols").on("click", function(e) {
+            e.preventDefault();
+            showAllColumns()
+
+        });
+
+        //adjusts the height of the record table based on browser window size, on load and on window resize
+        updateTableHeight();
+        window.onresize = function() {
+            updateTableHeight();
+        };
+        
+        //adjusts the height of the record table based on browser window size
+        function updateTableHeight() {
+            var tableTop = $("#tbl-records").offset().top;  // top position of the sticky object
+            var screenHeight = $(window).height();
+            var tableHeight = screenHeight - tableTop;
+            $(".table-responsive").css({
+                'height': tableHeight + 'px'
+            });
+        }
+
+    });
+</script> 
+{% endblock script %}

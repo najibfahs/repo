@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/main.css')}}">
+        <link rel="shortcut icon" type="image/x-icon" href="{{url_for('static', filename='images/favicon.png')}}">
+
+        <script src="https://kit.fontawesome.com/6226df76b9.js" crossorigin="anonymous"></script>
+
+
+        <meta charset="utf-8" />
+        {% if title %}
+            <title>{{ title }}</title>
+        {% else %}
+            <title>Accounts Repository</title>
+        {% endif %}
+        
+    </head>
+    <body>
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+            <span class="navbar-brand mb-0 h1"><i class="fab fa-accusoft fa-lg"></i></span>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <!-- left side of the navbar-->
+                <ul class="navbar-nav mr-auto">
+                    {% if request.path == "/" or request.path == "/home" or request.path == "/index" %}
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{{ url_for('home') }}">Home <span class="sr-only">(current)</span></a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('home') }}">Home <span class="sr-only">(current)</span></a>
+                        </li>
+                    {% endif %}
+
+                    {% if request.path == "/add" or request.path == "/bulk_upload" %}
+                        <li class="nav-item dropdown active">
+                    {% else %}
+                        <li class="nav-item dropdown">
+                    {% endif %}        
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown-get" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Add
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ url_for('add') }}">Add a record</a>
+                                <a class="dropdown-item" href="{{ url_for('bulk_upload') }}">Bulk Upload</a>
+                                <div class="dropdown-divider"></div>
+                            </div>
+                        </li>
+
+                    {% if request.path in ["/all", "/get", "/update"] %}
+                        <li class="nav-item dropdown active">
+                    {% else %}
+                        <li class="nav-item dropdown">
+                    {% endif %}        
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown-get" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Get
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ url_for('get') }}">Get/Update a record</a>
+                                <a class="dropdown-item" href="{{ url_for('all') }}">Get all records</a>
+                                <div class="dropdown-divider"></div>
+                            </div>
+                        </li>
+
+
+                    {% if request.path in ["/delete1", "/delete2", "/delete_all"] %}
+                        <li class="nav-item dropdown active">
+                    {% else %}
+                        <li class="nav-item dropdown">
+                    {% endif %}        
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown-delete" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Delete
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ url_for('delete1') }}">Delete - option 1</a>
+                                <a class="dropdown-item" href="{{ url_for('delete2') }}">Delete - option 2</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{ url_for('delete_all') }}">Delete all records</a>
+                            </div>
+                        </li>
+
+                </ul>
+                
+                <!-- right side of the navbar-->
+                <ul class="navbar-nav">
+                    {% if request.path in ["/account"] %}
+                        <li class="nav-item dropdown active">
+                    {% else %}
+                        <li class="nav-item dropdown">
+                    {% endif %}        
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown-user" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{current_user.username}}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ url_for('account') }}">Account</a>
+                                <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
+                                <div class="dropdown-divider"></div>
+                                
+                            </div>
+                        </li>
+
+                </ul>
+
+            </div>
+        </nav>
+            
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col border-0">
+                    {% with messages = get_flashed_messages(with_categories=True) %}
+                        {% if messages %}
+                            {% for (category, message) in messages %}
+                                <div class="alert alert-{{category}}">
+                                    {{message}}
+                                </div>
+                            {% endfor%}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+
+        
+        {% block content %}
+    
+        {% endblock content %}
+
+        
+
+        <!--
+            <div class="row">
+                <div class="col-md-12 shadow p-3 mb-5 bg-white rounded" >
+                    
+                </div>
+                
+            </div>
+        -->
+
+
+    
+    
+    
+    
+    
+                
+                    
+                
+            
+    
+
+
+
+
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <!-- Popper JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        
+        <script src="../static/js/custom.js"></script>
+
+        {% block script %}
+    
+        {% endblock script %}
+                
+
+        
+            
+        
+              
+    </body>
+</html>

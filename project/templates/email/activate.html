@@ -1,0 +1,17 @@
+{# ourapp/templates/email/activate.html #}
+
+Your account was successfully created. Please click the link below<br>
+to confirm your email address:
+
+<p>
+    <a href="{{ confirm_url }}">{{ confirm_url }}</a>
+</p>
+
+<p><strong>This link will expire in {{ config['EMAIL_TOKEN_EXPIRATION']/60 }} minutes.</strong></p>
+
+<p>
+    --<br>
+    Questions? Comments? Email hello@myapp.com.
+
+    
+</p>

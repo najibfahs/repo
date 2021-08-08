@@ -1,0 +1,102 @@
+{% from "_formhelpers.html" import render_field %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/main.css')}}">
+        <link rel="shortcut icon" type="image/x-icon" href="{{url_for('static', filename='images/favicon.png')}}">
+
+        <script src="https://kit.fontawesome.com/6226df76b9.js" crossorigin="anonymous"></script>
+
+        <meta charset="utf-8" />
+        <title>Login</title>
+
+        <style>
+            body {
+                background: rgb(43,82,121);
+                background: linear-gradient(90deg, rgba(43,82,121,1) 0%, rgba(43,82,121,1) 50%, rgba(0,212,255,1) 100%);
+                margin-top: 1rem;
+            }
+
+            a, a:hover {
+                color: rgb(238, 144, 82);
+            }
+        </style>
+        
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row" >
+                <div class="col-12 col-md-8 col-lg-6" style="margin: 0 auto; padding:0">
+                    {%- with messages = get_flashed_messages(with_categories=True) -%}
+                        {%- if messages -%}
+                            {%- for (category, message) in messages -%}
+                                <div class="alert alert-{{category}}">
+                                    {{message}}
+                                </div>
+                            {%- endfor -%}
+                        {%- endif -%}
+                    {%- endwith -%}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 col-md-8 col-lg-6" style="margin: 0 auto;">
+                    <form action="" method="POST">
+                    {{ form.hidden_tag() }} {# same as form.csrf_token #}
+                        <fieldset class='form-group'>
+                            <legend class='border-bottom mb-4 text-white'>LogIn</legend>
+                            <div class="form-row">
+                                <div class='form-group col-md-12 text-white'>
+                                    {{ render_field(form.email, has_label=True, placeholder='Enter your email') }}
+
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class='form-group col-md-12 text-white'>
+                                    {{ render_field(form.password, has_label=True, placeholder='Enter your password', maxlength=30) }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="form-check text-white">
+                                    {{ form.remember(class='form-check-input') }} {{ form.remember.label(class='form-check-label') }}
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class='form-group'>
+                            {{ form.submit(class='btn btn-outline-info') }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+                    
+            <div class="row" >
+                <div class="col-12 col-md-8 col-lg-6" style="margin: 0 auto; padding:0">
+                    <div class='border-top pt-3'>
+                        <small class='ml-2'>
+                            <a href="{{url_for('reset_request')}}">Forgot Password?</a>
+                        </small>
+                        <small class='text-light'>
+                            Need an account? <a href="{{ url_for('register') }}">Sign Up Now</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+
+
+    
+
+    </body>
+</html>
+

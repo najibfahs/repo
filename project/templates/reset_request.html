@@ -1,0 +1,118 @@
+{% from "_formhelpers.html" import render_field %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/main.css')}}">
+        <link rel="shortcut icon" type="image/x-icon" href="{{url_for('static', filename='images/favicon.png')}}">
+
+        <script src="https://kit.fontawesome.com/6226df76b9.js" crossorigin="anonymous"></script>
+
+        <style>
+            
+
+            body {
+                background-color: rgb(43, 82, 121);
+                margin-top: 1rem;
+            }
+
+            a, a:hover {
+                color: rgb(238, 144, 82);
+            }
+        </style>
+
+        <meta charset="utf-8" />
+        <title>Reset Password Request</title>
+        
+    </head>
+    <body>
+
+        <div class="container-fluid">
+            <div class="row" >
+                <div class="col-12 col-md-8 col-lg-6" style="margin: 0 auto; padding:0">
+                    {%- with messages = get_flashed_messages(with_categories=True) -%}
+                        {%- if messages -%}
+                            {%- for (category, message) in messages -%}
+                                <div class="alert alert-{{category}}">
+                                    {{message}}
+                                </div>
+                            {%- endfor -%}
+                        {%- endif -%}
+                    {%- endwith -%}
+                </div>
+            </div>
+
+            <div class="row" >
+                <div class="col-12 col-md-8 col-lg-6" style="margin: 0 auto; padding:0; text-align:center;">
+                    <!--
+                    <i class="fas fa-lock-open fa-10x"></i>
+                    -->
+                    <img src="{{url_for('static', filename='/images/password_reset.svg')}}" width="200" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 col-md-8 col-lg-6" style="margin: 0 auto;">
+                    <form action="" method="POST">
+                    {{ form.hidden_tag() }} {# same as form.csrf_token #}
+                        <fieldset class='form-group'>
+                            <legend class='border-bottom mb-4 text-white'>Reset Password Request</legend>
+                            <div class="form-row">
+                                <div class='form-group col-md-12 text-white'>
+                                    {{ render_field(form.email, has_label=False, placeholder='Enter your email') }}
+
+                                </div>
+                            </div>
+
+                            
+                        </fieldset>
+
+                        <div class='form-group'>
+                            {{ form.submit(class='btn btn-outline-info') }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+            <div class="row" >
+                <div class="col-12 col-md-8 col-lg-6" style="margin: 0 auto; padding:0">
+                    <div class='border-top pt-3'>
+                        <small class='text-light ml-3'>
+                            Need an account? <a href="{{ url_for('register') }}">Sign Up Now</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <!-- Popper JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        
+        <script src="../static/js/custom.js"></script>
+
+    </body>
+</html>

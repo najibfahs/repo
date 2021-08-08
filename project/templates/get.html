@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field, records_table %}
+
+
+{% block content %}
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+
+            <form action="" method="POST">
+                {{ form.hidden_tag() }} {# same as form.csrf_token #}
+                <fieldset class='form-group'>
+                    <legend class='border-bottom mb-4'>Get user record</legend>
+                    <div class="form-group">
+                        {{ render_field(form.resourcename, has_label=True, apply_color_to_label=False, placeholder="Enter the resourcename", maxlength=50, autocomplete="off" ) }}
+                        <div id="ajaxFeedbackContainer" class="list-group"></div>
+                        <small id="resourcename" class="form-text text-muted">1 to 50 characters max.</small>
+                    </div>
+                    <div class="form-check">
+                        {{ form.update_option(class="form-check-input") }}
+                        {{ form.update_option.label(class="form-check-label") }}
+                    </div>
+                </fieldset>
+                    {{ form.submit(class='btn btn-primary') }}
+            </form>
+            
+		</div>
+    </div>
+
+    <div class="row">
+		<div class="col-12 pt-3">
+        {%- if records is defined -%} {# if the variable records is passed #}
+            {%- if records -%} {# if there is data in records #}
+                <div class="alert alert-info" role="alert">{{records|length}} Record(s) retrieved</div>
+                {# build the record table #}
+                {{ records_table(records=records, action=False, recordIndex=True) }}
+
+                <a href="#" id="show-all-cols"><small>Show all columns</small></a>
+            {%- else  -%}
+                <div class="alert alert-danger" role="alert">No records found!</div>
+            {%- endif -%}
+        {%- endif -%}
+            
+		</div>
+    </div>
+
+    
+
+    <div class="row">
+		<div class="col-12 border-0">
+			<div id="feedback" class="" style="display:none;"></div>
+		</div>
+	</div>
+
+</div>
+
+
+
+
+<p></p>
+
+
+
+
+
+
+{% endblock content %}    
+
+
+{% block script %}
+<script>
+    $(document).ready(function(){
+        var inputField = $("#resourcename")
+        var btnContainer = $("#ajaxFeedbackContainer");
+        var feedback = $("#feedback")
+        var submit = $("#submit")
+
+        var csrf_token = "{{ csrf_token() }}";
+
+        setSubmitBtnState(state='disable')
+        
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                }
+            }
+        });
+
+        inputField.on("keyup", function () {
+            var msg = "";
+            var userInput = $(this).val();  //this is the user input
+            if (userInput.length > 0) {
+                $.get("ajax_display_accounts", {"resourcename":userInput, "owner_id":"{{current_user.id}}"}, function(data, status, xhr) {
+                    if (status == "success") {
+                        if (data == "" || data == undefined) {
+                            inputField.css({
+                                "background-color": "lightgrey"
+                            });
+                            setSubmitBtnState(state='disable')
+                        }
+                        else {
+                            inputField.css({
+                                "background-color": "transparent"
+                            });
+                            setSubmitBtnState(state='enable')
+                        }
+
+                        msg += "SUCCESS:<br />" + 
+                                "status code = " + xhr.status + "<br />" + 
+                                "status text = " + xhr.statusText + "<br />";
+                        
+                        //populating the button containers with HTML from Python
+                        btnContainer.html(data);
+                        btnContainer.show();
+                        
+                        //feedback on AJAX response status
+                        feedback.html(msg);
+                        feedback.removeClass();
+                        feedback.addClass('alert alert-success');
+                        feedback.show();
+                            
+                    }
+                    else {
+                        msg += "AN ERROR OCCURED:<br />" + 
+                                "status code = " + xhr.status + "<br />" + 
+                                "status text = " + xhr.statusText + "<br />";
+                        feedback.html(msg);
+                        feedback.removeClass();
+                        feedback.addClass('alert alert-danger');
+                        feedback.show();
+                        
+                    }
+                    
+                });
+                                
+            } 
+            else {
+                clearContainers();
+                setSubmitBtnState(state='disable');
+            }
+
+                
+        });
+
+        //event delegation since the buttons are dynamically loaded. 
+        //In other words, they are not part of the loaded DOM
+        btnContainer.on("click", "button.list-group-item", function() {
+            inputField.val($(this).text())
+            clearContainers();
+            
+        });
+
+
+        // empty the buttons container and feedback box
+        function clearContainers() {
+            btnContainer.empty();
+            btnContainer.hide();
+            feedback.empty();
+            feedback.hide();
+            inputField.css({"background-color": "transparent"});
+        }
+
+        $(".hide-header").on("click", function(e) {
+            e.preventDefault();
+            var column_number = parseInt($(this).attr('data'));
+            hideColumn(column_number, 'hide')
+
+        });
+
+        $("#show-all-cols").on("click", function(e) {
+            e.preventDefault();
+            showAllColumns()
+
+        });
+
+        /* *****************************FUNCTIONS***************************** */
+        function setSubmitBtnState(state='disable') {
+            if (state == 'disable') {
+                submit.prop ("disabled", true);
+                submit.css({
+                    "cursor": "not-allowed"
+                });
+            }
+            else if (state == 'enable') {
+                submit.prop ("disabled", false);
+                submit.css({
+                    "cursor": "pointer"
+                });
+            }
+        }
+        
+    });
+
+</script>  
+{% endblock script %}

@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field, record_table %}
+
+{% block content %}
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+        {%- if record is defined -%}
+            {%- if record -%}
+                {{ record_table(record=record) }}
+            {%- endif -%}
+        {%- endif -%}    
+            
+		</div>
+    </div>
+
+    <div class="row">
+		<div class="col-12">
+            <form action="" method="POST" id="add-form">
+                {{ form.hidden_tag() }} {# same as form.csrf_token #}
+                <fieldset class='form-group'>
+                    <legend class='border-bottom'>Add a new resource</legend>
+            
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            {{ render_field(form.resourcename, has_label=True, apply_color_to_label=False, placeholder="Enter resource name", maxlength=50) }}
+                            <small id="resourcename" class="form-text text-muted">1 to 50 characters max.</small>
+                        </div>
+                    </div>
+            
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            {{ render_field(form.username, has_label=True, apply_color_to_label=False, placeholder="Enter username", maxlength=50) }}
+                            <small id="username" class="form-text text-muted">3 to 50 characters max.</small>
+                        </div>
+                    </div>
+            
+                    <div class="form-check mb-2">
+                        {{ form.global_logon(class="form-check-input") }}
+                        {{ form.global_logon.label(class="form-check-label") }}
+                    </div>
+            
+                    {{ form.password.label }}
+                    <div class="form-row">
+                        <div class="input-group input-group-sm col-md-6">
+                            {%- if form.password.errors -%}
+                                {{ form.password(placeholder="Enter the password for the resource.", maxlength=30, class="form-control is-invalid") }}
+                                <div class="input-group-append ">
+                                    <button class="btn btn-outline-secondary" type="button" id="psw-show"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <div class="invalid-feedback">
+                                    {%- for error in form.password.errors -%}
+                                        {{ error }}
+                                    {%- endfor %}
+                                </div>
+                            {%- else -%}
+                                {{ form.password(placeholder="Enter the password for the resource.", maxlength=30, class="form-control") }}
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" id="psw-show"><i class="fas fa-eye"></i></button>
+                                </div>
+                            {%- endif -%}
+                        </div>
+                    </div>
+                    <small id="password" class="form-text text-muted">5 to 30 characters max.</small><p></p>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            {{ render_field(form.resourcelink, has_label=True, apply_color_to_label=False, placeholder="Enter semi-colon separated list of link(s) for the resource", maxlength=100) }}
+                            <small id="resourcelink" class="form-text text-muted">Up to 100 characters. Link must start with the URL protocol such as http, https, etc. Example: https://www.w3schools.com</small>
+                        </div>
+                    </div>
+            
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            {{ render_field(form.additionalinfo, has_label=True, apply_color_to_label=False, placeholder="Enter semi-colon separated list of additional info", maxlength=1000) }}
+                            <small id="additionalinfo" class="form-text text-muted">Up to 1000 characters.</small>
+                        </div>
+                    </div>
+            
+                </fieldset>
+                {{ form.submit(class='btn btn-primary') }}
+                
+                
+            </form>
+            
+		</div>
+    </div>
+
+    <div class="row">
+		<div class="col-12">
+            
+            
+		</div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">Password Missing</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>A password must be provided! You can either check the global logon checkbox or provide a password for the resource.</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-danger" data-dismiss="modal">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+    
+{% endblock content %}    
+
+{% block script %}
+<script>
+    $(document).ready(function(){
+
+        /*
+        update the status of the password field after document is loaded according 
+        to the status of the global_logon checkbox 
+        */
+        var chkbox_update = $("#global_logon");
+        var pswObj_update = $("#password");
+        var showPswBtnObj_update = $('#psw-show');  //to show/hide the password
+
+
+        initialize()
+        function initialize() {
+            setCheckBoxState (chkbox_update.is(":checked"));
+        }
+
+        chkbox_update.on('click', function() {
+            var checked = $(this).is(":checked");
+            setCheckBoxState (checked);
+        })
+
+        showPswBtnObj_update.on('mousedown', function() {
+            pswObj_update.attr ("type", "text");
+        })
+
+        showPswBtnObj_update.on('mouseup mouseout', function() {
+            pswObj_update.attr ("type", "password");
+        })
+
+        
+        //the form cannot be submitted if a password is not provided
+        //either the global logon box is checked or a user password is provided.
+        $("#add-form").on("submit", function(e) {
+            if (!chkbox_update.is(":checked") && !pswObj_update.val()) {
+                e.preventDefault();
+                $('#addModal').modal('show');
+                return false
+            }
+            else {
+                return true
+            }
+            
+
+        });
+
+        function setCheckBoxState (checked) {
+            //alert(checked)
+            if (checked) {
+                pswObj_update.val('');
+                pswObj_update.prop ("readonly", true);
+                showPswBtnObj_update.prop ("disabled", true);
+            }
+            else {
+                pswObj_update.val('');
+                pswObj_update.prop ("readonly", false);
+                showPswBtnObj_update.prop ("disabled", false);
+            }
+        }
+
+        
+
+
+    })
+
+</script>  
+{% endblock script %}
+
+
+<!--
+the render_field() replaces all the code below
+{{ form.username.label }}
+{% if form.username.errors %}
+    {{ form.username(placeholder="Enter city and country.", maxlength=50, class="form-control is-invalid") }}
+    <div class="invalid-feedback">
+        {% for error in form.username.errors %}
+            {{ error }}
+        {% endfor %}
+    </div>
+{% else %}
+    {{ form.username(placeholder="Enter city and country.", maxlength=50, class="form-control is-valid") }}
+{% endif %}
+-->

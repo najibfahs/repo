@@ -1,0 +1,183 @@
+{% macro render_field(field, has_label=True, apply_color_to_label=True, field_value="") %}
+
+    {% if has_label %}
+        {% if apply_color_to_label %}
+            {{field.label(class='form-control-label text-white mb-0')}}
+        {% else %}
+            {{field.label(class='form-control-label mb-0')}}
+        {% endif %}
+    {% endif %}
+    
+    {% if field.errors %}
+        {{ field(class='form-control form-control-sm is-invalid', value=field_value, **kwargs)|safe }}
+        <div class="invalid-feedback">
+            {% for error in field.errors %}
+                <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+    {% else %}
+        {{ field(class='form-control form-control-sm', **kwargs)|safe }}
+    {% endif %}
+{% endmacro %}
+
+
+
+
+
+
+{# displays a list of records (dictionaries) in a table #}
+{%- macro records_table(records=None, action=False, recordIndex=False) -%}
+    {%- if records -%}
+        {%- if recordIndex %} {# add a record index column at the start of the table? #}
+            {%- set headers = ['#'] -%}
+        {%- else %}
+            {%- set headers = [] -%}
+        {%- endif -%}
+
+        {# getting all the headers based on the first record #}
+        {%- for key,_ in records[0].items() -%}
+            {%- set _ = headers.append(key) -%}
+        {%- endfor -%}
+
+        {# adding an extra column for option to delete/update record #}
+        {%- if action -%}
+            {%- set _ = headers.append('action') -%}
+        {%- endif -%}
+        <!--
+            the tbl-records and filter ids are used in the custom.js filter function
+            to add filter functionality to the records table
+        
+        <input type="text" id="filter" placeholder="Search for resources...">
+        -->
+
+        
+        
+        <div class="table-responsive" id="tbl-records">
+            <table class="table table-striped table-sm" style='font-size:13px'>
+                <thead>
+                    <tr>
+                    {%- for header in headers if header != 'id' -%}
+                        {%- if header != 'id' -%} {# skip displaying id header #}
+                            {%- if header != 'action' -%}
+                                <th scope="col" style="white-space: nowrap;">{{header}} <a href="#" class="hide-header text-danger" data="{{loop.index0}}" title="hide column"><i class='fa fa-remove' style='font-size:10px'></i></a>
+                                </th>
+                            {%- else -%}
+                                <th scope="col" style="white-space: nowrap;">{{header}}</th>
+                            {%- endif -%}
+                        {%- endif -%}
+                    {%- endfor -%}
+                    </tr>
+                </thead>
+
+                <tbody>
+                {%- for record in records -%}
+                    <tr>
+                    {%- if recordIndex -%}
+                        <th scope="row">{{loop.index}}</th>
+                    {%- endif -%}
+
+                    {%- for key,value in record.items() -%}
+                        {%- if key != 'id' -%} {# skip displaying id data #}
+                            {%- if key == 'password' -%}
+                                <td>{{value}}</td>
+
+                            {%- elif key == 'link' -%}
+                                <td style='white-space:normal'>
+                                {%- if value and value|length > 1 -%}
+                                    {%- for link in value -%}
+                                        <a href='{{link|trim()}}' target='new_window'>{{record['resourcename']}}_{{loop.index}}</a><br />
+                                    {%- endfor -%}
+                                {%- elif value and value|length == 1 -%}
+                                    <a href='{{value[0]|trim()}}' target='new_window'>{{record['resourcename']}}</a><br />
+                                {% endif %}
+                                </td>
+
+                            {%- elif key == 'additional_info' -%}
+                                <td style='white-space:normal'>
+                                {%- if value and value|length > 1 -%}
+                                    {%- for info in value -%}
+                                        {{ info|trim() }}<br />
+                                    {%- endfor -%}
+                                {%- elif value and value|length == 1 -%}
+                                    {{ value[0]|trim() }}
+                                {%- endif -%}
+                                </td>
+                                
+                            {%- else -%}
+                                <td style="white-space:pre;">{{value}}</td>
+                            {%- endif -%}
+                        {%- endif -%}
+                    {%- endfor -%}
+
+                    {%- if action -%}
+                        <td class="">
+                            <a href="{{ url_for('action_delete', id=record['id']) }}" title="Delete record" id="delete-record" class="mr-2 text-danger"><i class='fa fa-times-circle'></i></a>
+                            <a href="{{ url_for('action_update', id=record['id']) }}" title="Update record" id="update-record" class="text-success"><i class='fa fa-pen-alt'></i></a>
+                        </td>
+                    </tr>
+                    {%- endif -%}
+
+                    </tr>
+                {%- endfor -%}
+                </tbody >
+            </table>
+        </div>
+    {%- endif -%}
+{%- endmacro -%}
+
+{# displays 1 record (dictionary) in a table #}
+{% macro record_table(record=None) %}
+    {% set headers = [] %}
+    {% if record %}
+        {# getting all the headers based on the record #}
+        {% for key,_ in record.items() %}
+            {% set _ = headers.append(key) %}
+        {% endfor %}
+        <div class="table-responsive">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                    {% for header in headers %}
+                        <th scope="col">{{header}}</th>   
+                    {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                
+                    <tr>
+                    {% for key,value in record.items() %}
+                        {% if key == 'link' %}
+                            <td style='white-space:normal'>
+                            {% if value and value|length > 1 %}
+                                {% for link in value %}
+                                    <a href='{{link|trim()}}'>{{record['resourcename']}}_{{loop.index}}</a><br />
+                                {% endfor %}
+                            {% elif value and value|length == 1 %}
+                                <a href='{{value[0]|trim()}}'>{{record['resourcename']}}</a>
+                            {% endif %}
+                            </td>
+                        
+                        {% elif key == 'additional_info' %}
+                            <td style='white-space:normal'>
+                            {% if value and value|length > 1 %}
+                                {% for info in value %}
+                                    {{ info|trim() }}<br />
+                                {% endfor %}
+                            {% elif value and value|length == 1 %}
+                                {{ value[0]|trim() }}
+                            {% endif %}
+                            </td>
+
+                            
+                        {% else %}
+                            <td style="white-space:pre;">{{value}}</td>
+                        {% endif %}
+                    {% endfor %}
+                    </tr>
+                
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endmacro %}

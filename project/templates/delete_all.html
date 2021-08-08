@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+        {%- if count is defined -%}
+            {%- if count > 0 -%} {# if there are any recordd for the active user #}
+                <p>You have <a href="{{url_for('all')}}">{{count}} record(s)</a> to delete. Click on the Submit button to delete all your records.</p>
+                <form id="form" method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+                
+            {%- else -%} 
+                <p>There are no records to delete.</p>
+
+            {%- endif -%} 
+        {%- endif -%} 
+		</div>
+    </div>
+</div>
+
+
+
+{% endblock content %}    
+
+
+{% block script %}
+    <script>
+        $(document).ready(function(){
+            $("#form").on("submit", function(e) {
+                return confirm("This action will delete the selected record! Are you sure you want to do this??");
+
+            });
+
+
+        })
+    </script>
+{% endblock script %}

@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block content %}
+
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			<form id="form" action="/delete1" method="POST">
+                {{ form.hidden_tag() }} {# same as form.csrf_token #}
+                <fieldset class='form-group'>
+                    <legend class='border-bottom mb-4'>Delete user record</legend>
+                    <div class="form-group">
+                        {{ render_field(form.resourcename, has_label=True, apply_color_to_label=False, placeholder="Enter the resource name", maxlength=50, autocomplete="off") }}
+                        <div id="ajaxFeedbackContainer" class="list-group"></div>
+                        <small id="resourcename" class="form-text text-muted">1 to 50 characters max.</small>
+                    </div>
+                </fieldset>
+                    {{ form.submit(class='btn btn-primary') }}
+            </form>
+		</div>
+    </div>
+
+    <div class="row">
+		<div class="col-12">
+        {%- if records is defined -%}
+            {%- if records -%}
+                <div class="alert alert-info" role="alert">The following records have been deleted:</div>
+                <ul class="list-group">
+                    {%- for (resourcename, username, join_date) in records -%}
+                        <li class="list-group-item">Resource = {{resourcename}} with username = {{username}} added on {{join_date}}</li>
+                    {%- endfor -%}
+                </ul>
+            {%- else  -%}
+                <div class="alert alert-danger" role="alert" id="record-found-alert">No such records found!</div>
+            {%- endif -%}
+        {%- endif -%}
+		</div>
+    </div>
+
+    <div class="row">
+		<div class="col-12">
+			<div id="feedback" class="" style="display:none;"></div>
+		</div>
+    </div>
+</div>
+
+
+
+    
+{% endblock content %}    
+
+{% block script %}
+<script>
+    $(document).ready(function(){
+        var inputField = $("#resourcename");
+        var btnContainer = $("#ajaxFeedbackContainer");
+        var feedback = $("#feedback");
+        var record_found_alert = $("#record-found-alert");
+
+        //initially, submit button is disabled
+        setSubmitBtnState(state='disable');
+
+
+        inputField.on("keyup", function () {
+            var msg = "";
+            var userInput = $(this).val();  //this is the user input
+
+            record_found_alert.empty();
+            record_found_alert.hide();
+
+            var csrf_token = "{{ csrf_token() }}";
+
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+
+
+            if (userInput.length > 0) {
+                $.get("ajax_display_accounts", {"resourcename":userInput, "owner_id":"{{current_user.id}}"}, function(data, status, xhr) {
+                    if (status == "success") {
+                        if (data == "" || data == undefined) { //no data returned from the server
+                            inputField.css({
+                                "background-color": "lightgrey"
+                            });
+                            setSubmitBtnState(state='disable');
+                        }
+                        else {
+                            inputField.css({
+                                "background-color": "transparent"
+                            });
+                            setSubmitBtnState(state='enable');
+                        }
+
+                        msg += "SUCCESS:<br />" + 
+                                "status code = " + xhr.status + "<br />" + 
+                                "status text = " + xhr.statusText + "<br />";
+                        
+                        //populating the button containers with HTML from Python
+                        btnContainer.html(data);
+                        btnContainer.show();
+                        
+                        //feedback on AJAX response status
+                        feedback.html(msg);
+                        feedback.removeClass();
+                        feedback.addClass('alert alert-success');
+                        feedback.show();
+                            
+                    }
+                    else {
+                        msg += "AN ERROR OCCURED:<br />" + 
+                                "status code = " + xhr.status + "<br />" + 
+                                "status text = " + xhr.statusText + "<br />";
+                        feedback.html(msg);
+                        feedback.removeClass();
+                        feedback.addClass('alert alert-danger');
+                        feedback.show();
+                    }
+                    
+                });
+                                
+            } 
+            else {
+                clearContainers();
+                setSubmitBtnState(state='disable');
+            }
+
+                
+        });
+
+        //event delegation since the buttons are dynamically loaded. 
+        //In other words, they are not part of the loaded DOM
+        btnContainer.on("click", "button.list-group-item", function() {
+            inputField.val($(this).text())
+            clearContainers();
+            
+        });
+
+
+        // empty the buttons container and feedback box
+        function clearContainers() {
+            btnContainer.empty();
+            btnContainer.hide();
+            feedback.empty();
+            feedback.hide();
+            inputField.css({"background-color": "transparent"});
+        }
+
+    
+        $("#form").on("submit", function(e) {
+            return confirm("This action will delete the selected record! Are you sure you want to do this??");
+
+        });
+
+        /* *****************************FUNCTIONS***************************** */
+        function setSubmitBtnState(state='disable') {
+            if (state == 'disable') {
+                $("#submit").prop ("disabled", true);
+                $("#submit").css({
+                    "cursor": "not-allowed"
+                });
+            }
+            else if (state == 'enable') {
+                $("#submit").prop ("disabled", false);
+                $("#submit").css({
+                    "cursor": "pointer"
+                });
+            }
+        }
+    
+    
+    });
+
+</script>  
+{% endblock script %}
